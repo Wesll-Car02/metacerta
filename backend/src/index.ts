@@ -52,6 +52,55 @@ app.post('/previsoes', async (req, res) => {
   }
 });
 
+// Generate weekly predictions based on start weight, goal and number of weeks
+app.post('/previsoes/planejar', async (req, res) => {
+  try {
+    const { id_cliente, peso_atual, peso_meta, semanas, data_inicio } = req.body as {
+      id_cliente: number;
+      peso_atual: number;
+      peso_meta: number;
+      semanas: number;
+      data_inicio?: string;
+    };
+
+    const startDate = data_inicio ? new Date(data_inicio) : new Date();
+    const step = (peso_meta - peso_atual) / semanas;
+
+    const entries = Array.from({ length: semanas }).map((_, i) => {
+      const data_pesagem = new Date(startDate);
+      data_pesagem.setDate(startDate.getDate() + (i + 1) * 7);
+      return {
+        id_cliente,
+        data_pesagem,
+        peso_previsto: Number((peso_atual + step * (i + 1)).toFixed(2)),
+        peso_atual: null,
+      };
+    });
+
+    const created = await prisma.$transaction(
+      entries.map((p) => prisma.previsao.create({ data: p }))
+    );
+
+    res.status(201).json(created);
+  } catch (e: any) {
+    res.status(400).json({ error: 'Invalid data', details: e.message });
+  }
+});
+
+// Update actual weight for a prediction
+app.put('/previsoes/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    const previsao = await prisma.previsao.update({
+      where: { id },
+      data: { peso_atual: Math.round(req.body.peso_atual * 100) / 100 },
+    });
+    res.json(previsao);
+  } catch (e: any) {
+    res.status(400).json({ error: 'Invalid data', details: e.message });
+  }
+});
+
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

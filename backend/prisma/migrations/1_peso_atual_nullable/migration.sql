@@ -1,0 +1,1 @@
+ALTER TABLE "Previsao" ALTER COLUMN "peso_atual" DROP NOT NULL;

@@ -11,6 +11,21 @@ body {
   padding: 1rem;
 }
 
+nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+nav a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
 .card {
   background: white;
   padding: 1rem;
@@ -25,6 +40,12 @@ body {
   gap: 0.5rem;
 }
 
+input, select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 button {
   background: #007bff;
   color: white;
@@ -36,6 +57,21 @@ button {
 
 button:hover {
   background: #0056b3;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+td button {
+  margin-left: 0.5rem;
 }
 
 @media (max-width: 600px) {
