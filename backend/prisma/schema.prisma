@@ -1,0 +1,40 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Cliente {
+  id              Int        @id @default(autoincrement())
+  nome            String
+  data_nascimento DateTime?
+  peso            Float?
+  altura          Float?
+  objetivo        Objetivo?  @relation(fields: [id_objetivo], references: [id])
+  id_objetivo     Int?
+  status          Boolean    @default(true)
+  data_cadastro   DateTime   @default(now())
+  percent_gordura Float?
+  percent_massa   Float?
+  previsoes       Previsao[]
+}
+
+model Objetivo {
+  id            Int       @id @default(autoincrement())
+  descricao     String
+  data_cadastro DateTime  @default(now())
+  clientes      Cliente[]
+}
+
+model Previsao {
+  id            Int       @id @default(autoincrement())
+  data_cadastro DateTime  @default(now())
+  data_pesagem  DateTime
+  cliente       Cliente   @relation(fields: [id_cliente], references: [id], onDelete: Cascade)
+  id_cliente    Int
+  peso_atual    Float
+  peso_previsto Float
+}
