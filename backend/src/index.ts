@@ -90,16 +90,31 @@ app.post('/previsoes/planejar', async (req, res) => {
 // Update actual weight for a prediction
 app.put('/previsoes/:id', async (req, res) => {
   const id = Number(req.params.id);
+
   try {
+    const raw = req.body?.peso_atual;
+
+    // aceita null/undefined para limpar a medição
+    const pesoAtual =
+      raw === null || raw === undefined || raw === ''
+        ? null
+        : Math.round(Number(raw) * 100) / 100;
+
+    if (pesoAtual !== null && !Number.isFinite(pesoAtual)) {
+      return res.status(400).json({ error: 'Invalid peso_atual' });
+    }
+
     const previsao = await prisma.previsao.update({
       where: { id },
-      data: { peso_atual: Math.round(req.body.peso_atual * 100) / 100 },
+      data: { peso_atual: pesoAtual }, // Prisma: campo deve ser Float? (nullable)
     });
+
     res.json(previsao);
   } catch (e: any) {
     res.status(400).json({ error: 'Invalid data', details: e.message });
   }
 });
+
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {

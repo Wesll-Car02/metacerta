@@ -11,4 +11,3 @@ export type Cliente = {
   previsoes: Previsao[];
   objetivo?: { descricao: string } | null;
 };
-
