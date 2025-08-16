@@ -11,6 +11,21 @@ body {
   padding: 1rem;
 }
 
+nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+nav a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
 .card {
   background: white;
   padding: 1rem;
@@ -23,6 +38,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+input, select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 button {
