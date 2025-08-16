@@ -1,7 +1,7 @@
 export type Previsao = {
   id: number;
   data_pesagem: string;
-  peso_atual: number;
+  peso_atual: number | null;
   peso_previsto: number;
 };
 
@@ -11,4 +11,3 @@ export type Cliente = {
   previsoes: Previsao[];
   objetivo?: { descricao: string } | null;
 };
-

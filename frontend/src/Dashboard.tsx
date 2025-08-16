@@ -24,16 +24,18 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const cliente = clientes.find(c => c.id === Number(idCliente));
-  const previsoes = cliente ? [...cliente.previsoes].sort((a, b) =>
-    new Date(a.data_pesagem).getTime() - new Date(b.data_pesagem).getTime()
-  ) : [];
+  const previsoes = cliente
+    ? [...cliente.previsoes].sort(
+        (a, b) => new Date(a.data_pesagem).getTime() - new Date(b.data_pesagem).getTime()
+      )
+    : [];
 
   const data = {
-    labels: previsoes.map(p => new Date(p.data_pesagem).toLocaleDateString()),
+    labels: previsoes.map(p => new Date(p.data_pesagem).toLocaleDateString('pt-BR')),
     datasets: [
       {
         label: 'Peso',
-        data: previsoes.map(p => p.peso_atual),
+        data: previsoes.map(p => (p.peso_atual ?? null)),
         borderColor: '#0d6efd',
         fill: false,
       },
@@ -63,4 +65,3 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
-

@@ -35,6 +35,6 @@ model Previsao {
   data_pesagem  DateTime
   cliente       Cliente   @relation(fields: [id_cliente], references: [id], onDelete: Cascade)
   id_cliente    Int
-  peso_atual    Float
+  peso_atual    Float?
   peso_previsto Float
 }

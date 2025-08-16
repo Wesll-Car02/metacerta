@@ -59,6 +59,21 @@ button:hover {
   background: #0056b3;
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+td button {
+  margin-left: 0.5rem;
+}
+
 @media (max-width: 600px) {
   .container {
     padding: 0.5rem;

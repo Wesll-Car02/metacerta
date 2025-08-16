@@ -31,7 +31,7 @@ const Home: React.FC = () => {
     peso_atual: '',
     peso_previsto: '',
   });
-  const [edits, setEdits] = React.useState<Record<number, string>>({});
+  const [edits, setEdits] = React.useState<Record<number, string | undefined>>({});
 
   const loadClientes = async () => {
     try {
@@ -90,17 +90,28 @@ const Home: React.FC = () => {
     }
   };
 
+  const iniciarEdicao = (id: number, valor: number | null) => {
+    setEdits((e) => ({ ...e, [id]: valor?.toString() ?? '' }));
+  };
+
   // Atualizar peso atual de uma previsão existente
   const salvarPeso = async (id: number) => {
     const valor = edits[id];
-    if (valor === undefined || valor === '') return;
+    if (valor === undefined) return;
+
+    const payload =
+      valor === '' ? { peso_atual: null } : { peso_atual: Math.round(Number(valor) * 100) / 100 };
+
     try {
       await fetch(`http://localhost:3001/previsoes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ peso_atual: Number(valor) }),
+        body: JSON.stringify(payload),
       });
-      setEdits((e) => ({ ...e, [id]: '' }));
+      setEdits((e) => {
+        const { [id]: _, ...rest } = e;
+        return rest;
+      });
       await loadClientes();
     } catch (err) {
       console.error('Erro ao salvar peso', err);
@@ -212,25 +223,50 @@ const Home: React.FC = () => {
         {clientes.map((c) => (
           <div key={c.id} className="cliente">
             <strong>{c.nome}</strong>
-            <ul>
-              {c.previsoes.map((p) => (
-                <li key={p.id}>
-                  {new Date(p.data_pesagem).toLocaleDateString('pt-BR')} — Previsto: {p.peso_previsto}kg • Atual:{' '}
-                  {p.peso_atual ?? '-'}kg
-                  <input
-                    type="number"
-                    step="0.1"
-                    placeholder="Atualizar peso"
-                    value={edits[p.id] ?? ''}
-                    onChange={(e) => setEdits((ed) => ({ ...ed, [p.id]: e.target.value }))}
-                    style={{ marginLeft: 8 }}
-                  />
-                  <button onClick={() => salvarPeso(p.id)} style={{ marginLeft: 4 }}>
-                    Salvar
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Previsto</th>
+                  <th>Peso real</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...c.previsoes]
+                  .sort(
+                    (a, b) =>
+                      new Date(a.data_pesagem).getTime() - new Date(b.data_pesagem).getTime()
+                  )
+                  .map((p) => (
+                    <tr key={p.id}>
+                      <td>{new Date(p.data_pesagem).toLocaleDateString('pt-BR')}</td>
+                      <td>{p.peso_previsto.toFixed(2)}kg</td>
+                      <td>
+                        {edits[p.id] !== undefined ? (
+                          <>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={edits[p.id]}
+                              onChange={(e) =>
+                                setEdits((ed) => ({ ...ed, [p.id]: e.target.value }))
+                              }
+                            />
+                            <button onClick={() => salvarPeso(p.id)}>Salvar</button>
+                          </>
+                        ) : (
+                          <>
+                            {p.peso_atual !== null && `${p.peso_atual.toFixed(2)}kg`}
+                            <button onClick={() => iniciarEdicao(p.id, p.peso_atual)}>
+                              {p.peso_atual !== null ? 'Editar' : 'Inserir'}
+                            </button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
           </div>
         ))}
       </div>
