@@ -19,6 +19,7 @@ const Home: React.FC = () => {
     data_inicio: '',
   });
   const [idClienteLista, setIdClienteLista] = React.useState('');
+  const [filtro, setFiltro] = React.useState('');
   const [edits, setEdits] = React.useState<Record<number, string | undefined>>({});
 
   const loadClientes = async () => {
@@ -35,7 +36,7 @@ const Home: React.FC = () => {
     loadClientes();
   }, []);
 
-  // Fluxo 1: Criar Plano de Peso (planejamento)
+  // Criar Plano de Peso (planejamento)
   const criarPlano = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -84,6 +85,55 @@ const Home: React.FC = () => {
       console.error('Erro ao salvar peso', err);
     }
   };
+
+  const clientesFiltrados = filtro
+    ? clientes.filter((c) => c.nome.toLowerCase().includes(filtro.toLowerCase()))
+    : [];
+
+  const renderTabelaCliente = (c: Cliente) => (
+    <div key={c.id} className="cliente">
+      <strong>{c.nome}</strong>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Previsto</th>
+            <th>Peso real</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[...c.previsoes]
+            .sort((a, b) => new Date(a.data_pesagem).getTime() - new Date(b.data_pesagem).getTime())
+            .map((p) => (
+              <tr key={p.id}>
+                <td>{new Date(p.data_pesagem).toLocaleDateString('pt-BR')}</td>
+                <td>{p.peso_previsto.toFixed(2)}kg</td>
+                <td>
+                  {edits[p.id] !== undefined ? (
+                    <>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={edits[p.id]}
+                        onChange={(e) => setEdits((ed) => ({ ...ed, [p.id]: e.target.value }))}
+                      />
+                      <button onClick={() => salvarPeso(p.id)}>Salvar</button>
+                    </>
+                  ) : (
+                    <>
+                      {p.peso_atual !== null && `${p.peso_atual.toFixed(2)}kg`}
+                      <button onClick={() => iniciarEdicao(p.id, p.peso_atual)}>
+                        {p.peso_atual !== null ? 'Editar' : 'Inserir'}
+                      </button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
+  );
 
   return (
     <>
@@ -139,11 +189,24 @@ const Home: React.FC = () => {
           <button type="submit">Gerar</button>
         </form>
       </div>
+
       <div className="card">
         <h2>Clientes</h2>
+
+        {/* Filtro por nome */}
+        <input
+          type="text"
+          placeholder="Buscar cliente"
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value)}
+          style={{ marginRight: 8 }}
+        />
+
+        {/* Seleção direta quando não houver filtro */}
         <select
           value={idClienteLista}
           onChange={(e) => setIdClienteLista(e.target.value)}
+          disabled={!!filtro.trim()}
         >
           <option value="">Selecione o cliente</option>
           {clientes.map((c) => (
@@ -153,60 +216,13 @@ const Home: React.FC = () => {
           ))}
         </select>
 
-        {(() => {
-          const c = clientes.find((cl) => cl.id === Number(idClienteLista));
-          if (!c) return null;
-
-          return (
-            <div className="cliente">
-              <strong>{c.nome}</strong>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Data</th>
-                    <th>Previsto</th>
-                    <th>Peso real</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...c.previsoes]
-                    .sort(
-                      (a, b) =>
-                        new Date(a.data_pesagem).getTime() - new Date(b.data_pesagem).getTime()
-                    )
-                    .map((p) => (
-                      <tr key={p.id}>
-                        <td>{new Date(p.data_pesagem).toLocaleDateString('pt-BR')}</td>
-                        <td>{p.peso_previsto.toFixed(2)}kg</td>
-                        <td>
-                          {edits[p.id] !== undefined ? (
-                            <>
-                              <input
-                                type="number"
-                                step="0.1"
-                                value={edits[p.id]}
-                                onChange={(e) =>
-                                  setEdits((ed) => ({ ...ed, [p.id]: e.target.value }))
-                                }
-                              />
-                              <button onClick={() => salvarPeso(p.id)}>Salvar</button>
-                            </>
-                          ) : (
-                            <>
-                              {p.peso_atual !== null && `${p.peso_atual.toFixed(2)}kg`}
-                              <button onClick={() => iniciarEdicao(p.id, p.peso_atual)}>
-                                {p.peso_atual !== null ? 'Editar' : 'Inserir'}
-                              </button>
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          );
-        })()}
+        {/* Se tiver texto no filtro, lista todos os correspondentes; caso contrário, mostra o selecionado */}
+        {filtro.trim()
+          ? clientesFiltrados.map((c) => renderTabelaCliente(c))
+          : (() => {
+              const c = clientes.find((cl) => cl.id === Number(idClienteLista));
+              return c ? renderTabelaCliente(c) : null;
+            })()}
       </div>
     </>
   );
