@@ -74,6 +74,15 @@ td button {
   margin-left: 0.5rem;
 }
 
+.cliente {
+  margin-top: 1rem;
+}
+
+.cliente strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
 @media (max-width: 600px) {
   .container {
     padding: 0.5rem;
