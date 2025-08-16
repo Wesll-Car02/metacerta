@@ -9,13 +9,6 @@ type PlanState = {
   data_inicio: string;
 };
 
-type FormState = {
-  id_cliente: string;
-  data_pesagem: string;
-  peso_atual: string;
-  peso_previsto: string;
-};
-
 const Home: React.FC = () => {
   const [clientes, setClientes] = React.useState<Cliente[]>([]);
   const [plan, setPlan] = React.useState<PlanState>({
@@ -25,12 +18,7 @@ const Home: React.FC = () => {
     semanas: '',
     data_inicio: '',
   });
-  const [form, setForm] = React.useState<FormState>({
-    id_cliente: '',
-    data_pesagem: '',
-    peso_atual: '',
-    peso_previsto: '',
-  });
+  const [filtro, setFiltro] = React.useState('');
   const [edits, setEdits] = React.useState<Record<number, string | undefined>>({});
 
   const loadClientes = async () => {
@@ -69,27 +57,6 @@ const Home: React.FC = () => {
     }
   };
 
-  // Fluxo 2: Adicionar Previsão (registro pontual)
-  const submitPrev = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await fetch('http://localhost:3001/previsoes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id_cliente: Number(form.id_cliente),
-          data_pesagem: form.data_pesagem,
-          peso_atual: Number(form.peso_atual),
-          peso_previsto: Number(form.peso_previsto),
-        }),
-      });
-      setForm({ id_cliente: '', data_pesagem: '', peso_atual: '', peso_previsto: '' });
-      await loadClientes();
-    } catch (err) {
-      console.error('Erro ao adicionar previsão', err);
-    }
-  };
-
   const iniciarEdicao = (id: number, valor: number | null) => {
     setEdits((e) => ({ ...e, [id]: valor?.toString() ?? '' }));
   };
@@ -117,6 +84,12 @@ const Home: React.FC = () => {
       console.error('Erro ao salvar peso', err);
     }
   };
+
+  const clientesFiltrados = filtro
+    ? clientes.filter((c) =>
+        c.nome.toLowerCase().includes(filtro.toLowerCase())
+      )
+    : [];
 
   return (
     <>
@@ -174,53 +147,14 @@ const Home: React.FC = () => {
       </div>
 
       <div className="card">
-        <h2>Adicionar Previsão</h2>
-        <form onSubmit={submitPrev}>
-          <select
-            value={form.id_cliente}
-            onChange={(e) => setForm({ ...form, id_cliente: e.target.value })}
-            required
-          >
-            <option value="">Selecione o cliente</option>
-            {clientes.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nome}
-              </option>
-            ))}
-          </select>
-
-          <input
-            type="date"
-            value={form.data_pesagem}
-            onChange={(e) => setForm({ ...form, data_pesagem: e.target.value })}
-            required
-          />
-
-          <input
-            type="number"
-            step="0.1"
-            placeholder="Peso atual"
-            value={form.peso_atual}
-            onChange={(e) => setForm({ ...form, peso_atual: e.target.value })}
-            required
-          />
-
-          <input
-            type="number"
-            step="0.1"
-            placeholder="Peso previsto"
-            value={form.peso_previsto}
-            onChange={(e) => setForm({ ...form, peso_previsto: e.target.value })}
-            required
-          />
-
-          <button type="submit">Salvar</button>
-        </form>
-      </div>
-
-      <div className="card">
         <h2>Clientes</h2>
-        {clientes.map((c) => (
+        <input
+          type="text"
+          placeholder="Buscar cliente"
+          value={filtro}
+          onChange={(e) => setFiltro(e.target.value)}
+        />
+        {clientesFiltrados.map((c) => (
           <div key={c.id} className="cliente">
             <strong>{c.nome}</strong>
             <table>
