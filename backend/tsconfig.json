@@ -11,5 +11,9 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "skipLibCheck": true
-  }
+  },
+  "exclude": [
+    "prisma",
+    "dist"
+  ]
 }

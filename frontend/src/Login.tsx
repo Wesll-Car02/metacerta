@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const Login: React.FC = () => {
   const [email, setEmail] = React.useState('');
   const [senha, setSenha] = React.useState('');
+  const [tipo, setTipo] = React.useState<'aluno' | 'treinador'>('aluno');
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,22 +26,40 @@ const Login: React.FC = () => {
   };
 
   return (
-    <form className="card" onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Senha"
-        value={senha}
-        onChange={(e) => setSenha(e.target.value)}
-      />
-      <button type="submit">Entrar</button>
-    </form>
+    <div className="card">
+      <div className="login-options">
+        <button
+          type="button"
+          className={tipo === 'aluno' ? 'active' : ''}
+          onClick={() => setTipo('aluno')}
+        >
+          Login aluno
+        </button>
+        <button
+          type="button"
+          className={tipo === 'treinador' ? 'active' : ''}
+          onClick={() => setTipo('treinador')}
+        >
+          Login treinador
+        </button>
+      </div>
+      <form onSubmit={handleSubmit}>
+        <h2>{tipo === 'aluno' ? 'Login Aluno' : 'Login Treinador'}</h2>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Senha"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+        />
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
   );
 };
 

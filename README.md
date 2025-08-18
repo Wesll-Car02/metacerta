@@ -18,6 +18,12 @@ docker-compose up --build
 - `frontend/` Aplicação React com Vite
 - `docker-compose.yml` Orquestração dos serviços
 
+## Usuários de teste
+
+- Treinador: treinador@example.com / senha: treinador123
+- Aluno: aluno@example.com / senha: aluno123 (vinculado ao treinador)
+
+
 ## Próximos passos
 
 - Autenticação de usuários

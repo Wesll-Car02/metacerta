@@ -88,3 +88,10 @@ td button {
     padding: 0.5rem;
   }
 }
+.login-options {
+  flex-direction: row;
+  margin-bottom: 1rem;
+}
+.login-options button.active {
+  background: #0056b3;
+}
