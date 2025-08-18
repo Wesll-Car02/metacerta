@@ -13,7 +13,9 @@ CREATE TABLE "Usuario" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Usuario_email_key" ON "Usuario"("email");
-CREATE UNIQUE INDEX IF NOT EXISTS "Usuario_clienteId_key" ON "Usuario"("clienteId");
+-- Ensure stale indexes are removed before creating the unique constraint
+DROP INDEX IF EXISTS "Usuario_clienteId_key";
+CREATE UNIQUE INDEX "Usuario_clienteId_key" ON "Usuario"("clienteId");
 
 -- AlterTable
 ALTER TABLE "Cliente" ADD COLUMN "treinadorId" INTEGER;

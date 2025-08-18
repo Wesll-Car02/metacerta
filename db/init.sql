@@ -1,3 +1,6 @@
+-- Clean up potentially conflicting indexes from previous runs
+DROP INDEX IF EXISTS "Usuario_clienteId_key";
+
 CREATE TABLE "Objetivo" (
   "id" SERIAL PRIMARY KEY,
   "descricao" TEXT NOT NULL,
