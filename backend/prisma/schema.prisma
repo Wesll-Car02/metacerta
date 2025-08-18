@@ -7,6 +7,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum Role {
+  CLIENTE
+  TREINADOR
+}
+
 model Cliente {
   id              Int        @id @default(autoincrement())
   nome            String
@@ -20,6 +25,9 @@ model Cliente {
   percent_gordura Float?
   percent_massa   Float?
   previsoes       Previsao[]
+  treinador       Usuario?  @relation("TreinadorClientes", fields: [treinadorId], references: [id])
+  treinadorId     Int?
+  usuario         Usuario?  @relation("UserCliente")
 }
 
 model Objetivo {
@@ -37,4 +45,15 @@ model Previsao {
   id_cliente    Int
   peso_atual    Float?
   peso_previsto Float
+}
+
+model Usuario {
+  id         Int      @id @default(autoincrement())
+  nome       String
+  email      String   @unique
+  senha      String
+  role       Role
+  cliente    Cliente? @relation("UserCliente", fields: [clienteId], references: [id])
+  clienteId  Int?     @unique
+  clientes   Cliente[] @relation("TreinadorClientes")
 }

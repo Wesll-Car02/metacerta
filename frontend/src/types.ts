@@ -20,4 +20,5 @@ export type Cliente = {
   percent_massa?: number | null;
   previsoes: Previsao[];
   objetivo?: Objetivo | null;
+  treinadorId?: number | null;
 };
