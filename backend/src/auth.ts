@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { $Enums } from '@prisma/client';
 
 const secret = process.env.JWT_SECRET || 'secret';
 
 export interface AuthPayload {
   id: number;
-  role: 'CLIENTE' | 'TREINADOR';
+  role: $Enums.Role;
   clienteId?: number | null;
 }
 

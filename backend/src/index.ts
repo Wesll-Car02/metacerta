@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient, $Enums } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { authenticate, generateToken, AuthRequest } from './auth';
 
@@ -17,7 +17,7 @@ app.post('/usuarios', async (req, res) => {
       nome: string;
       email: string;
       senha: string;
-      role: Role;
+      role: $Enums.Role;
       clienteId?: number;
     };
     const hashed = await bcrypt.hash(senha, 10);
