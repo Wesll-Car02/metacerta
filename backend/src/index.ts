@@ -132,17 +132,34 @@ app.post('/previsoes/planejar', authenticate, async (req: AuthRequest, res) => {
       semanas: number;
       data_inicio?: string;
     };
+    if (![peso_atual, peso_meta].every((n) => typeof n === 'number' && Number.isFinite(n))) {
+      return res
+        .status(400)
+        .json({ error: 'peso_atual and peso_meta must be valid numbers' });
+    }
+    if (!Number.isInteger(semanas) || semanas <= 0) {
+      return res
+        .status(400)
+        .json({ error: 'semanas must be a positive integer' });
+    }
+
     const clientId = req.user?.role === 'CLIENTE' ? req.user.clienteId : id_cliente;
     if (!clientId) {
       return res.status(400).json({ error: 'id_cliente required' });
     }
+
     if (req.user?.role === 'TREINADOR') {
       const cliente = await prisma.cliente.findFirst({
         where: { id: clientId, treinadorId: req.user.id },
       });
       if (!cliente) return res.status(403).json({ error: 'Sem acesso ao cliente' });
     }
+
     const startDate = data_inicio ? new Date(data_inicio) : new Date();
+    if (isNaN(startDate.getTime())) {
+      return res.status(400).json({ error: 'data_inicio inválida' });
+    }
+
     const step = (peso_meta - peso_atual) / semanas;
 
     const entries = Array.from({ length: semanas }).map((_, i) => {
