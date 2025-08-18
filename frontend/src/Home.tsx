@@ -1,5 +1,6 @@
 import React from 'react';
 import { Cliente } from './types';
+import { API_URL } from './api';
 
 type PlanState = {
   id_cliente: string;
@@ -25,7 +26,7 @@ const Home: React.FC = () => {
 
   const loadClientes = async () => {
     try {
-      const res = await fetch('http://localhost:3001/clientes', {
+      const res = await fetch(`${API_URL}/clientes`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -43,7 +44,7 @@ const Home: React.FC = () => {
   const criarPlano = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch('http://localhost:3001/previsoes/planejar', {
+      await fetch(`${API_URL}/previsoes/planejar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -74,7 +75,7 @@ const Home: React.FC = () => {
       valor === '' ? { peso_atual: null } : { peso_atual: Math.round(Number(valor) * 100) / 100 };
 
     try {
-      await fetch(`http://localhost:3001/previsoes/${id}`, {
+      await fetch(`${API_URL}/previsoes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload),
