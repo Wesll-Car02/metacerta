@@ -7,9 +7,11 @@ async function main() {
   // trainer account
   const trainerEmail = 'treinador@example.com';
   const alunoEmail = 'aluno@example.com';
+  const aluno2Email = 'aluno2@example.com';
 
   const trainerPassword = await bcrypt.hash('treinador123', 10);
   const alunoPassword = await bcrypt.hash('aluno123', 10);
+  const aluno2Password = await bcrypt.hash('aluno123', 10);
 
   const trainer = await prisma.usuario.upsert({
     where: { email: trainerEmail },
@@ -38,6 +40,26 @@ async function main() {
         senha: alunoPassword,
         role: 'CLIENTE',
         clienteId: cliente.id,
+      },
+    });
+  }
+
+  const existingAluno2 = await prisma.usuario.findUnique({ where: { email: aluno2Email } });
+  if (!existingAluno2) {
+    const cliente2 = await prisma.cliente.create({
+      data: {
+        nome: 'Aluno Dois',
+        treinadorId: trainer.id,
+      },
+    });
+
+    await prisma.usuario.create({
+      data: {
+        nome: 'Aluno Dois',
+        email: aluno2Email,
+        senha: aluno2Password,
+        role: 'CLIENTE',
+        clienteId: cliente2.id,
       },
     });
   }
