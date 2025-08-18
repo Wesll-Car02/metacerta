@@ -21,9 +21,14 @@ services:
     ports:
       - "${BACKEND_PORT}:3001"
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL}
     depends_on:
       - backend
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
     ports:
       - "${FRONTEND_PORT}:3000"
 volumes:

@@ -10,6 +10,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { Cliente } from './types';
+import { API_URL } from './api';
 
 Chart.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
@@ -20,7 +21,7 @@ const Dashboard: React.FC = () => {
   const token = localStorage.getItem('token');
 
   React.useEffect(() => {
-    fetch('http://localhost:3001/clientes', {
+    fetch(`${API_URL}/clientes`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
@@ -54,7 +55,7 @@ const Dashboard: React.FC = () => {
   const handleAdd = async () => {
     const peso = prompt('Informe o peso');
     if (!peso) return;
-    await fetch('http://localhost:3001/previsoes', {
+    await fetch(`${API_URL}/previsoes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -62,7 +63,7 @@ const Dashboard: React.FC = () => {
       },
       body: JSON.stringify({ id_cliente: Number(idCliente), data_pesagem: new Date(), peso_atual: Number(peso), peso_previsto: Number(peso) }),
     });
-    const data = await fetch('http://localhost:3001/clientes', {
+    const data = await fetch(`${API_URL}/clientes`, {
       headers: { Authorization: `Bearer ${token}` },
     }).then((r) => r.json());
     setClientes(data);

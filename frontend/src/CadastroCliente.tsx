@@ -1,5 +1,6 @@
 import React from 'react';
 import { Objetivo } from './types';
+import { API_URL } from './api';
 
 const CadastroCliente: React.FC = () => {
   const [nome, setNome] = React.useState('');
@@ -13,14 +14,14 @@ const CadastroCliente: React.FC = () => {
   const token = localStorage.getItem('token');
 
   React.useEffect(() => {
-    fetch('http://localhost:3001/objetivos')
+    fetch(`${API_URL}/objetivos`)
       .then((r) => r.json())
       .then(setObjetivos);
   }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch('http://localhost:3001/clientes', {
+    await fetch(`${API_URL}/clientes`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
