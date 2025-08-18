@@ -21,10 +21,13 @@ const Home: React.FC = () => {
   const [idClienteLista, setIdClienteLista] = React.useState('');
   const [filtro, setFiltro] = React.useState('');
   const [edits, setEdits] = React.useState<Record<number, string | undefined>>({});
+  const token = localStorage.getItem('token');
 
   const loadClientes = async () => {
     try {
-      const res = await fetch('http://localhost:3001/clientes');
+      const res = await fetch('http://localhost:3001/clientes', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       setClientes(data);
     } catch (err) {
@@ -42,7 +45,7 @@ const Home: React.FC = () => {
     try {
       await fetch('http://localhost:3001/previsoes/planejar', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           id_cliente: Number(plan.id_cliente),
           peso_atual: Number(plan.peso_atual),
@@ -73,7 +76,7 @@ const Home: React.FC = () => {
     try {
       await fetch(`http://localhost:3001/previsoes/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload),
       });
       setEdits((e) => {
