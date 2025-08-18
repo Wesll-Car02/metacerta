@@ -8,12 +8,12 @@ CREATE TABLE "Usuario" (
   "email" TEXT NOT NULL,
   "senha" TEXT NOT NULL,
   "role" "Role" NOT NULL,
-  "clienteId" INTEGER UNIQUE
+  "clienteId" INTEGER
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Usuario_email_key" ON "Usuario"("email");
-CREATE UNIQUE INDEX "Usuario_clienteId_key" ON "Usuario"("clienteId");
+CREATE UNIQUE INDEX IF NOT EXISTS "Usuario_clienteId_key" ON "Usuario"("clienteId");
 
 -- AlterTable
 ALTER TABLE "Cliente" ADD COLUMN "treinadorId" INTEGER;
