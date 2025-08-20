@@ -1,13 +1,27 @@
 import express from 'express';
 import cors from 'cors';
+import session from 'express-session';
 import { PrismaClient, $Enums } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { authenticate, generateToken, AuthRequest } from './auth';
+import { authenticate, AuthRequest, AuthPayload } from './auth';
 
 const app = express();
 const prisma = new PrismaClient();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  })
+);
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false },
+  })
+);
 app.use(express.json());
 
 // User registration
@@ -37,8 +51,19 @@ app.post('/login', async (req, res) => {
   if (!usuario || !(await bcrypt.compare(senha, usuario.senha))) {
     return res.status(401).json({ error: 'Credenciais inválidas' });
   }
-  const token = generateToken({ id: usuario.id, role: usuario.role, clienteId: usuario.clienteId });
-  res.json({ token, role: usuario.role, clienteId: usuario.clienteId });
+  const payload: AuthPayload = {
+    id: usuario.id,
+    role: usuario.role,
+    clienteId: usuario.clienteId,
+  };
+  req.session.user = payload;
+  res.json({ role: usuario.role, clienteId: usuario.clienteId });
+});
+
+app.post('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.json({ ok: true });
+  });
 });
 
 app.get('/clientes', authenticate, async (req: AuthRequest, res) => {
