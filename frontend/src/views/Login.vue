@@ -44,11 +44,11 @@ const handleSubmit = async () => {
   const res = await fetch(`${API_URL}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({ email: email.value, senha: senha.value }),
   });
   if (res.ok) {
     const data = await res.json();
-    localStorage.setItem('token', data.token);
     localStorage.setItem('role', data.role);
     if (data.clienteId) localStorage.setItem('clienteId', data.clienteId);
     router.push('/');

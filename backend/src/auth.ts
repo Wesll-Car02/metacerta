@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
 import { $Enums } from '@prisma/client';
-
-const secret = process.env.JWT_SECRET || 'secret';
+import session from 'express-session';
 
 export interface AuthPayload {
   id: number;
@@ -10,23 +8,25 @@ export interface AuthPayload {
   clienteId?: number | null;
 }
 
+declare module 'express-session' {
+  interface SessionData {
+    user?: AuthPayload;
+  }
+}
+
 export interface AuthRequest extends Request {
+  session: session.Session & Partial<session.SessionData>;
   user?: AuthPayload;
 }
 
-export const generateToken = (payload: AuthPayload) => {
-  return jwt.sign(payload, secret, { expiresIn: '1d' });
-};
-
-export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const auth = req.headers.authorization;
-  if (!auth) return res.status(401).json({ error: 'Token required' });
-  const [, token] = auth.split(' ');
-  try {
-    const decoded = jwt.verify(token, secret) as AuthPayload;
-    req.user = decoded;
-    next();
-  } catch (e) {
-    res.status(401).json({ error: 'Invalid token' });
+export const authenticate = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: 'Not authenticated' });
   }
+  req.user = req.session.user;
+  next();
 };
